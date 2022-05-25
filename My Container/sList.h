@@ -44,8 +44,11 @@ public:
 	bool Delete( Data deletion );
 	template<class BiPred> bool Delete( Data deletion, BiPred pred );
 
+
 	void Destroy();
 };
+
+// ============================================================================
 
 template<class Data>
 inline bool sList<Data>::Load( std::string fileName, const char mode )
@@ -139,12 +142,13 @@ inline bool sList<Data>::Delete( Data deletion )
 				prev = cur->next;
 				delete cur;
 			}
-			break;
+			--size;
+			return true;
 		}
 		prev = cur;
 		cur = cur->next;
 	}
-	--size;
+	return false;
 }
 
 template<class Data>
@@ -168,12 +172,13 @@ inline bool sList<Data>::Delete( Data deletion, BiPred pred )
 				prev = cur->next;
 				delete cur;
 			}
-			break;
+			--size;
+			return true;
 		}
 		prev = cur;
 		cur = cur->next;
 	}
-	--size;
+	return false;
 }
 
 template<class Data>
