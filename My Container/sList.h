@@ -43,7 +43,12 @@ public:
 	// Deletion
 	bool Delete( Data deletion );
 	template<class BiPred> bool Delete( Data deletion, BiPred pred );
-
+	bool DeleteAll( Data deletion );
+	template<class BiPred> bool DeleteAll( Data deletion, BiPred pred );
+	
+	// Pop
+	Data pop_back();
+	Data pop_front();
 
 	void Destroy();
 };
@@ -152,6 +157,61 @@ inline bool sList<Data>::Delete( Data deletion )
 }
 
 template<class Data>
+inline bool sList<Data>::DeleteAll( Data deletion )
+{
+	pNode cur{ head };
+	pNode prev{};
+	bool isDeleted{};
+
+	while ( cur ) {
+		if ( cur->data == deletion ) {
+			if ( cur == head ) {
+				head = head->next;
+				delete cur;
+			}
+			else if ( cur == tail ) {
+				tail = prev;
+				delete cur;
+			}
+			else {
+				prev = cur->next;
+				delete cur;
+			}
+			--size;
+			isDeleted = true;
+		}
+		prev = cur;
+		cur = cur->next;
+	}
+	return isDeleted;
+}
+
+template<class Data>
+inline Data sList<Data>::pop_back()
+{
+	return Data();
+}
+
+template<class Data>
+inline Data sList<Data>::pop_front()
+{
+	return Data();
+}
+
+template<class Data>
+inline void sList<Data>::Destroy()
+{
+	pNode next{};
+	while ( head ) {
+		next = head->next;
+		delete head;
+		head = next;
+	}
+
+	head = tail = nullptr;
+}
+
+template<class Data>
 template<class BiPred>
 inline bool sList<Data>::Delete( Data deletion, BiPred pred )
 {
@@ -182,14 +242,32 @@ inline bool sList<Data>::Delete( Data deletion, BiPred pred )
 }
 
 template<class Data>
-inline void sList<Data>::Destroy()
+template<class BiPred>
+inline bool sList<Data>::DeleteAll( Data deletion, BiPred pred )
 {
-	pNode next{};
-	while ( head ) {
-		next = head->next;
-		delete head;
-		head = next;
-	}
+	pNode cur{ head };
+	pNode prev{};
+	bool isDeleted{};
 
-	head = tail = nullptr;
+	while ( cur ) {
+		if ( !pred( cur->data, deletion ) && !pred( deletion, cur->data ) ) {
+			if ( cur == head ) {
+				head = head->next;
+				delete cur;
+			}
+			else if ( cur == tail ) {
+				tail = prev;
+				delete cur;
+			}
+			else {
+				prev = cur->next;
+				delete cur;
+			}
+			--size;
+			isDeleted = true;
+		}
+		prev = cur;
+		cur = cur->next;
+	}
+	return isDeleted;
 }
